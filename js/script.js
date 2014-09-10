@@ -1,7 +1,3 @@
-var matrixA = new Array();
-var matrixB = new Array();
-var matrixSize = 0;
-
 $(document).ready(function(){
 	var inputTable = '#inputTable';
 	var errorMessage = $('#errorMessage');
@@ -10,9 +6,13 @@ $(document).ready(function(){
 	startButton.on('click', function() {
 		if ( CheckInput() ) {
 			errorMessage.html('');
-			GetData();
-			if ( CalcDeterminant( matrixA ) !== 0 ) {
 
+			var tempArray = GetData();
+			var matrixA = tempArray[0];
+			var matrixB = tempArray[1];
+
+			if ( CalcDeterminant( matrixA ) !== 0 ) {
+				StartSolving( matrixA, matrixB );
 			} else {
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
 			}
@@ -39,29 +39,22 @@ function CheckInput() {
 };
 
 function GetData() {
+	var A = new Array();
+	var B = new Array();
+	var Size = 0;
+
 	$( inputTable ).find('tr').each(function(i){
-		matrixA[i] = new Array();
+		A[i] = new Array();
 		$( this ).find( 'td input' ).each(function(j){
-			matrixA[i][j] = $( this ).val();
-			matrixB[i] = $( this ).val();
+			A[i][j] = $( this ).val();
+			B[i] = $( this ).val();
 		});
-		matrixA[i].pop();
+		A[i].pop();
 	});
-	matrixSize = matrixA.length;
+	Size = A.length;
+
+	return [A, B, Size];
 };
-
-function FindGlavElement( dataArray ) {
-	var temp = dataArray[0][0];
-	var rows = dataArray.length;
-	var cols = dataArray[0].length;
-
-	for (var i = 0; i < rows; i++) {
-		for (var j = 0; j < cols; j++) {
-			if ( dataArray[i][j] > temp )
-				temp = dataArray[i][j];
-		};
-	};
-}
 
 function CalcDeterminant( A ) {
     var s;
@@ -95,4 +88,32 @@ function CalcDeterminant( A ) {
         det += s * A[0][i] * (CalcDeterminant(smaller));
     }
     return (det);
+}
+
+function StartSolving( A, B ) {
+	for ( var i = 0; i < A.length; i++ ) {
+		var temp = FindGlavElement( A );
+		var mainElement = temp[0];
+		var mainRow = temp[1];
+		var mainColumn = temp[2];
+		console.log(mainElement, mainRow, mainColumn);
+	}
+}
+
+function FindGlavElement( dataArray ) {
+	var maxValue = Math.abs( dataArray[0][0] );
+	var row = 0;
+	var column = 0;
+
+	for (var i = 0; i < dataArray[0].length; i++) {
+		for (var j = 0; j < dataArray[0].length; j++) {
+			if ( Math.abs( dataArray[i][j] ) > maxValue ) {
+				maxValue = Math.abs( dataArray[i][j] );
+				row = i;
+				column = j;
+			};
+		};
+	};
+
+	return [maxValue, row, column];
 }
