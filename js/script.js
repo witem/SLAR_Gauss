@@ -1,3 +1,5 @@
+var solution = new Array();
+
 $(document).ready(function(){
 	var inputTable = '#inputTable';
 	var errorMessage = $('#errorMessage');
@@ -12,7 +14,8 @@ $(document).ready(function(){
 			var matrixB = tempArray[1];
 
 			if ( CalcDeterminant( matrixA ) !== 0 ) {
-				StartSolving( matrixA, matrixB );
+
+				console.log( StartSolving( matrixA, matrixB ) );
 			} else {
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
 			}
@@ -77,28 +80,41 @@ function CalcDeterminant( A ) {
                     smaller[a - 1][b] = A[a][b];
                 } else if (b > i) {
                     smaller[a - 1][b - 1] = A[a][b];
-                }
-            }
-        }
+                };
+            };
+        };
         if (i % 2 == 0) {
             s = 1;
         } else {
             s = -1;
-        }
+        };
         det += s * A[0][i] * (CalcDeterminant(smaller));
-    }
+    };
     return (det);
-}
+};
 
 function StartSolving( A, B ) {
-	for ( var i = 0; i < A.length; i++ ) {
-		var temp = FindGlavElement( A );
-		var mainElement = temp[0];
-		var mainRow = temp[1];
-		var mainColumn = temp[2];
-		console.log(mainElement, mainRow, mainColumn);
-	}
-}
+	var temp 			= FindGlavElement( A );
+	var mainElement 	= temp[0];
+	var mainRow 		= temp[1];
+	var mainColumn 		= temp[2];
+	var coeffM 			= FindCoeff_m( A, mainElement, mainRow, mainColumn );
+	var temp 			= FindCoeff_a( A, B, coeffM, mainRow, mainColumn );
+	var newA 			= temp[0];
+	var newB 			= temp[1];
+
+	solution.push(A[mainRow]);
+	solution[solution.length - 1].push(B[mainRow]);
+
+	if ( newA.length != 1 ) {
+		return StartSolving( newA, newB );
+	} else {
+		solution.push(newA[0]);
+		solution[solution.length - 1].push(newB[0]);
+
+		return solution;
+	};
+};
 
 function FindGlavElement( dataArray ) {
 	var maxValue = Math.abs( dataArray[0][0] );
@@ -116,4 +132,39 @@ function FindGlavElement( dataArray ) {
 	};
 
 	return [maxValue, row, column];
-}
+};
+
+function FindCoeff_m( A, elem, row, column ) {
+	var m = new Array();
+
+	for (var i = 0; i < A.length; i++) {
+		if ( i != row ) {
+			m.push( -1 * ( A[i][column] / elem ));
+		};
+	};
+
+	return m;
+};
+
+function FindCoeff_a( matrixA, matrixB, m, row, column ) {
+	var newMatrixA = new Array();
+	var newMatrixB = new Array();
+
+	for (var i = 0; i < matrixA.length; i++) {
+		if ( i != row ) {
+			newMatrixA[( i > row ? (i-1) : i )] = new Array();
+
+			for (var j = 0; j < matrixA.length; j++) {
+				if ( j != column ) 
+					newMatrixA[( i > row ? (i-1) : i )][( j > column ? (j-1) : j )] = +(matrixA[i][j]) + +(matrixA[row][j] * ( i > row ? m[i-1] : m[i] ));
+			};
+		};
+	};
+
+	for (var i = 0; i < matrixB.length; i++) {
+		if ( i != row )
+			newMatrixB[( i > row ? (i-1) : i )] = +(matrixB[i]) + +(matrixB[row] * ( i > row ? m[i-1] : m[i] ));
+	};
+
+	return [newMatrixA, newMatrixB];
+};
