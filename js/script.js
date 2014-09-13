@@ -1,4 +1,5 @@
 var solution = new Array();
+var columnSol = new Array();
 
 $(document).ready(function(){
 	var inputTable = '#inputTable';
@@ -14,8 +15,10 @@ $(document).ready(function(){
 			var matrixB = tempArray[1];
 
 			if ( CalcDeterminant( matrixA ) !== 0 ) {
+				solution = new Array();
+				columnSol = new Array();
 
-				console.log( StartSolving( matrixA, matrixB ) );
+				renderMatrixSolution( StartSolving( matrixA, matrixB ), columnSol );
 			} else {
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
 			}
@@ -105,12 +108,15 @@ function StartSolving( A, B ) {
 
 	solution.push(A[mainRow]);
 	solution[solution.length - 1].push(B[mainRow]);
+	columnSol.push(mainColumn);
+	renderMatrix( A, B );
 
 	if ( newA.length != 1 ) {
 		return StartSolving( newA, newB );
 	} else {
 		solution.push(newA[0]);
 		solution[solution.length - 1].push(newB[0]);
+		renderMatrix( newA, newB );
 
 		return solution;
 	};
@@ -168,3 +174,34 @@ function FindCoeff_a( matrixA, matrixB, m, row, column ) {
 
 	return [newMatrixA, newMatrixB];
 };
+
+function renderMatrix( matrixA, matrixB ) {
+	var renderDiv = "#matrixTable";
+
+	$(renderDiv).append('<table></table>')
+	for (var i = 0; i < matrixA.length; i++) {
+		$(renderDiv + ' table:last-child').append('<tr></tr>');
+
+		for (var j = 0; j < matrixA.length; j++) {
+			$(renderDiv + ' table:last-child tr:last-child').append('<td>' + parseFloat(matrixA[i][j]).toFixed(3) + '</td>');
+		};
+	};
+
+	for (var i = 0; i < matrixB.length; i++) {
+		$(renderDiv + ' table:last-child tr:eq(' + i + ')').append('<td>' + parseFloat(matrixB[i]).toFixed(3) + '</td>');
+	};
+}
+
+function renderMatrixSolution( solutionArray, solutionColumn ) {
+	var renderDiv = "#matrixSolution";
+
+	$(renderDiv).append('<table></table>')
+	for (var i = 0; i < solutionArray.length; i++) {
+		$(renderDiv + ' table').append('<tr></tr>');
+		for (var j = 0; j < solutionArray[0].length; j++) {
+			if ( solutionArray[i][j] !== undefined) {
+				$(renderDiv + ' table tr:last-child').append('<td>' + parseFloat(solutionArray[i][j]).toFixed(3) + '</td>');
+			};
+		};
+	};
+}
