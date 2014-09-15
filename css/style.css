@@ -9,3 +9,11 @@ input.error {
 	border: solid 1px #000;
 	width: 50px;
 }
+.resultBlock table.noBorder tr {
+	display: block;
+}
+.resultBlock table.noBorder td {
+	display: inline-block;
+	border: none;
+	width: auto;
+}

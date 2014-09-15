@@ -18,8 +18,12 @@ $(document).ready(function(){
 				solution = new Array();
 				columnSol = new Array();
 
-				renderMatrixSolution( StartSolving( matrixA, matrixB ), columnSol );
+				ClearRender();
+				solution = StartSolving( matrixA, matrixB );
+				RenderMatrixSolution( solution, columnSol );
+				CalculateVectorSolution( solution, columnSol );
 			} else {
+				ClearRender();
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
 			}
 		} else {
@@ -109,14 +113,14 @@ function StartSolving( A, B ) {
 	solution.push(A[mainRow]);
 	solution[solution.length - 1].push(B[mainRow]);
 	columnSol.push(mainColumn);
-	renderMatrix( A, B );
+	RenderMatrix( A, B );
 
 	if ( newA.length != 1 ) {
 		return StartSolving( newA, newB );
 	} else {
 		solution.push(newA[0]);
 		solution[solution.length - 1].push(newB[0]);
-		renderMatrix( newA, newB );
+		RenderMatrix( newA, newB );
 
 		return solution;
 	};
@@ -175,10 +179,14 @@ function FindCoeff_a( matrixA, matrixB, m, row, column ) {
 	return [newMatrixA, newMatrixB];
 };
 
-function renderMatrix( matrixA, matrixB ) {
+function ClearRender() {
+	$('.resultBlock > div').html('');
+}
+
+function RenderMatrix( matrixA, matrixB ) {
 	var renderDiv = "#matrixTable";
 
-	$(renderDiv).append('<table></table>')
+	$(renderDiv).append('<table></table>');
 	for (var i = 0; i < matrixA.length; i++) {
 		$(renderDiv + ' table:last-child').append('<tr></tr>');
 
@@ -192,16 +200,57 @@ function renderMatrix( matrixA, matrixB ) {
 	};
 }
 
-function renderMatrixSolution( solutionArray, solutionColumn ) {
+function RenderMatrixSolution( solutionArray, solutionColumn ) {
 	var renderDiv = "#matrixSolution";
+	var symbolArray = new Array();
 
-	$(renderDiv).append('<table></table>')
+	for (var i = 0; i < solutionArray[0].length - 1; i++) {
+		symbolArray.push('x<sub>' + (i + 1) + '</sub>')
+	};
+
+	$(renderDiv).append('<table class="noBorder"></table>')
 	for (var i = 0; i < solutionArray.length; i++) {
 		$(renderDiv + ' table').append('<tr></tr>');
-		for (var j = 0; j < solutionArray[0].length; j++) {
-			if ( solutionArray[i][j] !== undefined) {
-				$(renderDiv + ' table tr:last-child').append('<td>' + parseFloat(solutionArray[i][j]).toFixed(3) + '</td>');
+
+		for (var j = 0; j < solutionArray[i].length; j++) {
+			if ( j < solutionArray[i].length - 1 ) {
+				var plus = ( parseFloat(solutionArray[i][j]) >= 0 && j > 0 ) ? ' + ' : '';
+				$(renderDiv + ' table tr:last-child').append('<td>' + plus +
+					parseFloat(solutionArray[i][j]).toFixed(3) + '*' + symbolArray[j] + '</td>');
+			} else {
+				$(renderDiv + ' table tr:last-child').append('<td> = ' + 
+					parseFloat(solutionArray[i][j]).toFixed(3) + '</td>');
 			};
 		};
+
+		symbolArray.splice(solutionColumn[i],1);
 	};
 }
+
+function CalculateVectorSolution( solutionArray, solutionColumn ) {
+	var vectorSolution = new Object();
+	var systemEquations = new Array();
+	var symbolArray = new Array();
+
+	for (var i = 0; i < solutionArray[0].length - 1; i++) {
+		symbolArray.push('x' + (i + 1) + '')
+	};
+
+	for (var i = 0; i < solutionArray.length; i++) {
+		systemEquations[i] = new Array();
+		for (var j = 0; j < solutionArray[i].length; j++) {
+			var obj = {};
+			if ( j < solutionArray[i].length - 1 ) {
+				obj[symbolArray[j]] = solutionArray[i][j];
+				systemEquations[i].push(obj);
+			} else {
+				obj.b = solutionArray[i][j];
+				systemEquations[i].push(obj);
+			};
+		};
+
+		symbolArray.splice(solutionColumn[i],1);
+	};
+
+	console.log(systemEquations);
+};
