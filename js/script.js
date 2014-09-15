@@ -21,7 +21,8 @@ $(document).ready(function(){
 				ClearRender();
 				solution = StartSolving( matrixA, matrixB );
 				RenderMatrixSolution( solution, columnSol );
-				CalculateVectorSolution( solution, columnSol );
+				var vectSolution = CalculateVectorSolution( solution, columnSol );
+				RenderSolution(vectSolution);
 			} else {
 				ClearRender();
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
@@ -237,20 +238,74 @@ function CalculateVectorSolution( solutionArray, solutionColumn ) {
 	};
 
 	for (var i = 0; i < solutionArray.length; i++) {
-		systemEquations[i] = new Array();
+		systemEquations[i] = new Object();
+
 		for (var j = 0; j < solutionArray[i].length; j++) {
 			var obj = {};
-			if ( j < solutionArray[i].length - 1 ) {
+			if ( j < solutionArray[i].length - 1 )
 				obj[symbolArray[j]] = solutionArray[i][j];
-				systemEquations[i].push(obj);
-			} else {
+			else
 				obj.b = solutionArray[i][j];
-				systemEquations[i].push(obj);
-			};
+			
+			systemEquations[i] = Collect(systemEquations[i], obj);
 		};
 
 		symbolArray.splice(solutionColumn[i],1);
 	};
 
-	console.log(systemEquations);
+	for (var i = systemEquations.length - 1; i >= 0 ; i--) {
+		if ( i == systemEquations.length - 1 ) {
+			var firstKey;
+			for(var k in systemEquations[i]) 
+				if ( k !== 'b') firstKey = k;
+			vectorSolution[firstKey] = parseFloat(systemEquations[i]['b'] / systemEquations[i][firstKey]).toFixed(3);
+		} else {
+			var adding = 0;
+
+			for(var k in systemEquations[i]) 
+				if ( k !== 'b') 
+					if ( vectorSolution.hasOwnProperty(k) )
+						adding += vectorSolution[k] * systemEquations[i][k];
+					else
+						var newKey = k;
+
+			vectorSolution[newKey] = parseFloat(( systemEquations[i]['b'] - adding ) / systemEquations[i][newKey]).toFixed(3);
+		}
+	};
+
+	return vectorSolution;
 };
+
+/* concatenate objects */
+function Collect() {
+  var ret = {};
+  var len = arguments.length;
+  for (var i=0; i<len; i++) {
+    for (p in arguments[i]) {
+      if (arguments[i].hasOwnProperty(p)) {
+        ret[p] = arguments[i][p];
+      }
+    }
+  }
+  return ret;
+}
+
+function RenderSolution(vectorSolution, vectorNevyasoc) {
+	var renderDiv = "#vectSolution";
+
+	$(renderDiv).html(ObjectToString(vectorSolution));
+
+}
+/* object to string*/
+function ObjectToString() {
+  var ret = "";
+  var len = arguments.length;
+  for (var i=0; i<len; i++) {
+    for (p in arguments[i]) {
+      if (arguments[i].hasOwnProperty(p)) {
+        ret += p + ": " + arguments[i][p] + "; ";
+      }
+    }
+  }
+  return ret;
+}
