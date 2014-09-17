@@ -5,6 +5,31 @@ $(document).ready(function(){
 	var inputTable = '#inputTable';
 	var errorMessage = $('#errorMessage');
 	var startButton = $('#findSolution');
+	var sizeSubButton = $('#sizeSub');
+	var sizeAddButton = $('#sizeAdd');
+
+	sizeSubButton.on('click', function() {
+		errorMessage.html('');
+		if ( $(inputTable + " tr").length > 2 ) {
+			ClearRender();
+			$(inputTable + " tr:last-child").remove();
+			$(inputTable + " tr td:nth-last-child(2)").remove();
+		} else {
+			ClearRender();
+			errorMessage.html('Мінімум змінних 2!');
+		}
+	});
+
+	sizeAddButton.on('click', function() {
+		errorMessage.html('');
+		if ( $(inputTable + " tr").length < 20 ) {
+			ClearRender();
+			AddInputTableSize(inputTable);
+		} else {
+			ClearRender();
+			errorMessage.html('Максимум змінних Х!');
+		}
+	});
 
 	startButton.on('click', function() {
 		if ( CheckInput() ) {
@@ -22,16 +47,27 @@ $(document).ready(function(){
 				solution = StartSolving( matrixA, matrixB );
 				RenderMatrixSolution( solution, columnSol );
 				var vectSolution = CalculateVectorSolution( solution, columnSol );
-				RenderSolution(vectSolution);
+				RenderSolution(vectSolution, CalculateVectorErrors( vectSolution, matrixA, matrixB ) );
 			} else {
 				ClearRender();
 				errorMessage.html('Детермінант дорівнює 0, тому цю СЛАР не можна розвязати методом Гаусса з вибором головного елементу');
 			}
 		} else {
+			ClearRender();
 			errorMessage.html('Не вірно заповнені вхідні дані!');
 		}
 	});
 });
+
+function AddInputTableSize(tableId) {
+	for (var i = 0; i < $(tableId + " tr").length; i++) {
+		$(tableId + ' tr:nth-child(' + (i + 1) + ') td:last-child').clone().appendTo( tableId + ' tr:nth-child(' + (i + 1) + ')' );
+		$(tableId + ' tr:nth-child(' + (i + 1) + ') td:nth-last-child(2) input').val(0);
+	};
+
+	$(tableId + ' tr:last-child').clone().appendTo(tableId);
+	$(tableId + ' tr:last-child input').val(0);
+}
 
 function CheckInput() {
 	var status = true;
@@ -187,6 +223,8 @@ function ClearRender() {
 function RenderMatrix( matrixA, matrixB ) {
 	var renderDiv = "#matrixTable";
 
+	if ( $(renderDiv).find('h4').length == 0 )
+		$(renderDiv).append('<h4>Покрово отримані матриці:</h4>');
 	$(renderDiv).append('<table></table>');
 	for (var i = 0; i < matrixA.length; i++) {
 		$(renderDiv + ' table:last-child').append('<tr></tr>');
@@ -209,6 +247,7 @@ function RenderMatrixSolution( solutionArray, solutionColumn ) {
 		symbolArray.push('x<sub>' + (i + 1) + '</sub>')
 	};
 
+	$(renderDiv).append('<h4>Зведена система:</h4>');
 	$(renderDiv).append('<table class="noBorder"></table>')
 	for (var i = 0; i < solutionArray.length; i++) {
 		$(renderDiv + ' table').append('<tr></tr>');
@@ -276,6 +315,33 @@ function CalculateVectorSolution( solutionArray, solutionColumn ) {
 	return vectorSolution;
 };
 
+function CalculateVectorErrors( vectorSolution, matrixA, matrixB ) {
+	var vectorErrors = new Object();
+
+	for (var i = 0; i < matrixA.length; i++) {
+		var summ = 0;
+		for (var j = 0; j < matrixA.length; j++) {
+			summ += parseFloat(vectorSolution['x' + (j + 1)]) * parseFloat(matrixA[i][j]);
+		}
+		vectorErrors["e" + i] = parseFloat((parseFloat(matrixB[i]) - summ).toFixed(6));
+	};
+
+	return vectorErrors;
+}
+
+function RenderSolution(vectorSolution, vectorErrors) {
+	var solDiv = "#vectSolution";
+	var errorDiv = "#vectErros";
+
+
+	$(solDiv).append('<h4>Вектор розв\'язку:</h4>');
+	$(solDiv).append("<p>" + ObjectToString(vectorSolution) + "</p>");
+
+	$(errorDiv).append('<h4>Вектор нев\'язок:</h4>');
+	$(errorDiv).append("<p>" + ObjectToString(vectorErrors) + "</p>");
+
+}
+
 /* concatenate objects */
 function Collect() {
   var ret = {};
@@ -288,13 +354,6 @@ function Collect() {
     }
   }
   return ret;
-}
-
-function RenderSolution(vectorSolution, vectorNevyasoc) {
-	var renderDiv = "#vectSolution";
-
-	$(renderDiv).html(ObjectToString(vectorSolution));
-
 }
 /* object to string*/
 function ObjectToString() {
