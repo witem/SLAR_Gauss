@@ -22,12 +22,12 @@ $(document).ready(function(){
 
 	sizeAddButton.on('click', function() {
 		errorMessage.html('');
-		if ( $(inputTable + " tr").length < 20 ) {
+		if ( $(inputTable + " tr").length < 11 ) {
 			ClearRender();
 			AddInputTableSize(inputTable);
 		} else {
 			ClearRender();
-			errorMessage.html('Максимум змінних Х!');
+			errorMessage.html('Максимум змінних 10! При подальшому збільшенні можливі зависання.');
 		}
 	});
 
