@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+	<meta charset="UTF-8">
+	<title>Розв'язок СЛАР - методом Гаусса з вибором головного елементу</title>
+
+	<link rel="stylesheet" href="css/style.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript" src="js/script.js"></script>
+</head>
+<body>
+	<div class="inputBlockWrap">
+		<table id="inputTable">
+			<tbody>
+				<tr>
+					<td><input type="number" value="0"></td>
+					<td><input type="number" value="1"></td>
+					<td><input type="number" value="3"></td>
+					<td><input type="number" value="2"></td>
+					<td><input type="number" value="-1"></td>
+				</tr>
+				<tr>
+					<td><input type="number" value="1000"></td>
+					<td><input type="number" value="3"></td>
+					<td><input type="number" value="1"></td>
+					<td><input type="number" value="-5"></td>
+					<td><input type="number" value="-2"></td>
+				</tr>
+				<tr>
+					<td><input type="number" value="-3"></td>
+					<td><input type="number" value="4"></td>
+					<td><input type="number" value="1"></td>
+					<td><input type="number" value="4"></td>
+					<td><input type="number" value="-1"></td>
+				</tr>
+				<tr>
+					<td><input type="number" value="4"></td>
+					<td><input type="number" value="0"></td>
+					<td><input type="number" value="2"></td>
+					<td><input type="number" value="3"></td>
+					<td><input type="number" value="4"></td>
+				</tr>
+			</tbody>
+		</table>
+		<button id="findSolution">Знайти розвязок</button>
+		<p class="rigt_text">Розмірність: <button id="sizeSub">-</button> <button id="sizeAdd">+</button></p>
+		<div id="errorMessage" class="errorMessage"></div>
+	</div>
+	<div class="resultBlock">
+		<div id="matrixTable"></div>
+		<div id="matrixSolution"></div>
+		<div id="vectSolution"></div>
+		<div id="vectErros"></div>
+	</div>
+</body>
+</html>
