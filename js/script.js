@@ -164,13 +164,13 @@ function StartSolving( A, B ) {
 };
 
 function FindGlavElement( dataArray ) {
-	var maxValue = Math.abs( dataArray[0][0] );
+	var maxValue = dataArray[0][0];
 	var row = 0;
 	var column = 0;
 
 	for (var i = 0; i < dataArray[0].length; i++) {
 		for (var j = 0; j < dataArray[0].length; j++) {
-			if ( Math.abs( dataArray[i][j] ) > maxValue ) {
+			if ( Math.abs( dataArray[i][j] ) > Math.abs( maxValue )) {
 				maxValue = dataArray[i][j];
 				row = i;
 				column = j;
