@@ -171,7 +171,7 @@ function FindGlavElement( dataArray ) {
 	for (var i = 0; i < dataArray[0].length; i++) {
 		for (var j = 0; j < dataArray[0].length; j++) {
 			if ( Math.abs( dataArray[i][j] ) > maxValue ) {
-				maxValue = Math.abs( dataArray[i][j] );
+				maxValue = dataArray[i][j];
 				row = i;
 				column = j;
 			};
